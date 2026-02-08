@@ -27,9 +27,9 @@ trait RequestTrait {
         $headers[ 'Accept' ] = 'application/json';
 
         // The $token param will not be sent on the first API call which should exchange the request code for a token.
-        if ( $accessToken ):
+        if ( $accessToken ) {
             $headers[ 'Authorization' ] = 'Bearer ' . $accessToken;
-        endif;
+        }
 
         $options = [
             'base_uri' => self::BASE_URL,
@@ -63,18 +63,18 @@ trait RequestTrait {
             'debug'   => $this->debug,
         ];
 
-        foreach ( $additionalHeaders as $header => $value ):
+        foreach ( $additionalHeaders as $header => $value ) {
             $options[ 'headers' ][ $header ] = $value;
-        endforeach;
+        }
 
         $options = array_merge( $options, $additionalOptions );
 
-        if ( 'POST' == $method ):
+        if ( 'POST' == $method ) {
             $options[ 'headers' ][ 'Content-Type' ] = 'application/json';
             return $this->client->post( $url, $options );
-        else:
+        } else {
             return $this->client->get( $url, $options );
-        endif;
+        }
     }
 
 
@@ -82,10 +82,19 @@ trait RequestTrait {
      * @param \GuzzleHttp\Psr7\Response $response
      *
      * @return array
+     * @throws \RuntimeException
      */
     public function json(Response $response): array {
         $responseContents = $response->getBody()->getContents();
-        return json_decode( $responseContents, true );
+        $decoded = json_decode( $responseContents, true );
+
+        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException(
+                'Failed to decode JSON response: ' . json_last_error_msg()
+            );
+        }
+
+        return $decoded ?? [];
     }
 
 

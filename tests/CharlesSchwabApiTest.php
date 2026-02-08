@@ -7,17 +7,6 @@ use GuzzleHttp\Client;
 use MichaelDrennen\SchwabAPI\SchwabAPI;
 use PHPUnit\Framework\TestCase;
 
-
-if ( !function_exists( 'dd' ) ) {
-    function dd() {
-        echo '<pre>';
-        array_map( function ( $x ) {
-            var_dump( $x );
-        }, func_get_args() );
-        die;
-    }
-}
-
 class CharlesSchwabApiTest extends TestCase {
 
     protected string $code;
@@ -55,6 +44,7 @@ class CharlesSchwabApiTest extends TestCase {
 
 
     /**
+     * @test
      * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
      */

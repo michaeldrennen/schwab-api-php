@@ -132,6 +132,24 @@ class SchwabAPI {
                                  string $refreshToken = NULL,
                                  bool   $debug = FALSE ) {
 
+        // Validate required parameters
+        if (empty($apiKey)) {
+            throw new \InvalidArgumentException('API Key is required and cannot be empty');
+        }
+
+        if (empty($apiSecret)) {
+            throw new \InvalidArgumentException('API Secret is required and cannot be empty');
+        }
+
+        if (empty($apiCallbackUrl)) {
+            throw new \InvalidArgumentException('API Callback URL is required and cannot be empty');
+        }
+
+        // Validate that either authentication code or access token is provided
+        if (empty($authenticationCode) && empty($accessToken)) {
+            throw new \InvalidArgumentException('Either authentication code or access token must be provided');
+        }
+
         $this->apiKey         = $apiKey;
         $this->apiSecret      = $apiSecret;
         $this->apiCallbackUrl = $apiCallbackUrl;
@@ -155,19 +173,38 @@ class SchwabAPI {
         $rows = [];
 
         $rows[] = "Schwab API: ";
-        $rows[] = " apiKey: " . $this->apiKey;
-        $rows[] = " apiSecret: " . $this->apiSecret;
+        $rows[] = " apiKey: " . $this->maskSensitiveData($this->apiKey);
+        $rows[] = " apiSecret: " . $this->maskSensitiveData($this->apiSecret);
         $rows[] = " apiCallbackUrl: " . $this->apiCallbackUrl;
-        $rows[] = " session: " . $this->session;
+        $rows[] = " session: " . $this->maskSensitiveData($this->session);
         $rows[] = " expiresIn: " . $this->expiresIn;
         $rows[] = " tokenType: " . $this->tokenType;
         $rows[] = " scope: " . $this->scope;
-        $rows[] = " refreshToken: " . $this->refreshToken;
-        $rows[] = " accessToken: " . $this->accessToken;
-        $rows[] = " idToken: " . $this->idToken;
+        $rows[] = " refreshToken: " . $this->maskSensitiveData($this->refreshToken);
+        $rows[] = " accessToken: " . $this->maskSensitiveData($this->accessToken);
+        $rows[] = " idToken: " . $this->maskSensitiveData($this->idToken);
         $rows[] = " debug: " . $this->debug;
 
         return implode( PHP_EOL, $rows );
+    }
+
+    /**
+     * Masks sensitive data for safe logging/debugging
+     *
+     * @param string|null $data
+     * @return string
+     */
+    private function maskSensitiveData(?string $data): string {
+        if ($data === null || $data === '') {
+            return '[not set]';
+        }
+
+        $length = strlen($data);
+        if ($length <= 8) {
+            return '****';
+        }
+
+        return substr($data, 0, 4) . '****' . substr($data, -4);
     }
 
 
@@ -202,13 +239,13 @@ class SchwabAPI {
         ];
 
 
-        if ( $doRefreshToken ):
-            if ( !$this->refreshToken ):
+        if ( $doRefreshToken ) {
+            if ( !$this->refreshToken ) {
                 throw new \Exception( "You are asking to refresh the access token, but you don't have a refresh token." );
-            endif;
+            }
             $options[ 'form_params' ][ 'grant_type' ]    = 'refresh_token';
             $options[ 'form_params' ][ 'refresh_token' ] = $this->refreshToken;
-        endif;
+        }
 
         try {
             $response = $this->client->post( 'https://api.schwabapi.com/v1/oauth/token', $options );
@@ -228,6 +265,18 @@ class SchwabAPI {
              */
             $data = json_decode( $json, TRUE );
 
+            if ($data === null) {
+                throw new RequestException( "Failed to decode JSON response from Schwab API", 0, NULL, $json );
+            }
+
+            // Validate required fields are present
+            $requiredFields = ['expires_in', 'token_type', 'scope', 'refresh_token', 'access_token', 'id_token'];
+            foreach ($requiredFields as $field) {
+                if (!isset($data[$field])) {
+                    throw new RequestException( "Missing required field '$field' in token response", 0, NULL, $json );
+                }
+            }
+
             // Set all the protected properties that we gather from the POST in this method.
             $this->expiresIn    = $data[ 'expires_in' ];
             $this->tokenType    = $data[ 'token_type' ];
@@ -237,11 +286,43 @@ class SchwabAPI {
             $this->idToken      = $data[ 'id_token' ];
 
             return;
-        } catch ( \Exception $exception ) {
+        } catch ( \GuzzleHttp\Exception\ClientException $exception ) {
             $response             = $exception->getResponse();
             $responseBodyAsString = $response->getBody()->getContents();
+            $statusCode          = $response->getStatusCode();
 
-            throw new RequestException( "Schwab API returned an error.", 0, NULL, $responseBodyAsString );
+            throw new RequestException(
+                "Schwab API client error (HTTP $statusCode)",
+                $statusCode,
+                $exception,
+                $responseBodyAsString
+            );
+        } catch ( \GuzzleHttp\Exception\ServerException $exception ) {
+            $response             = $exception->getResponse();
+            $responseBodyAsString = $response->getBody()->getContents();
+            $statusCode          = $response->getStatusCode();
+
+            throw new RequestException(
+                "Schwab API server error (HTTP $statusCode)",
+                $statusCode,
+                $exception,
+                $responseBodyAsString
+            );
+        } catch ( \GuzzleHttp\Exception\GuzzleException $exception ) {
+            throw new RequestException(
+                "HTTP request failed: " . $exception->getMessage(),
+                0,
+                $exception
+            );
+        } catch ( RequestException $exception ) {
+            // Re-throw our own exceptions
+            throw $exception;
+        } catch ( \Exception $exception ) {
+            throw new RequestException(
+                "Unexpected error during token request: " . $exception->getMessage(),
+                0,
+                $exception
+            );
         }
     }
 
