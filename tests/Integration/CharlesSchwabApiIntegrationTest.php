@@ -4,6 +4,7 @@ namespace MichaelDrennen\SchwabAPI\Tests\Integration;
 
 use GuzzleHttp\Client;
 use MichaelDrennen\SchwabAPI\SchwabAPI;
+use MichaelDrennen\SchwabAPI\Tests\Helpers\OAuthAutomation;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,11 +20,42 @@ class CharlesSchwabApiIntegrationTest extends TestCase {
     protected SchwabAPI $api;
 
     protected function setUp(): void {
-        $this->code     = $_ENV['CODE'];
-        $this->session  = $_ENV['SESSION'] ?? '';
         $apiKey         = $_ENV['SCHWAB_API_KEY'];
         $apiSecret      = $_ENV['SCHWAB_API_SECRET'];
         $apiCallbackUri = $_ENV['SCHWAB_TOKEN_CALLBACK_URL'];
+        $chromePath     = $_ENV['CHROME_PATH'] ?? '';
+        $username       = $_ENV['SCHWAB_USERNAME'] ?? '';
+        $password       = $_ENV['SCHWAB_PASSWORD'] ?? '';
+
+        // Attempt to get a fresh OAuth code using automation
+        // Only if username, password, and Chrome path are provided
+        if (!empty($username) && !empty($password) && !empty($chromePath) && file_exists($chromePath)) {
+            try {
+                $automation = new OAuthAutomation(
+                    chromePath: $chromePath,
+                    apiKey: $apiKey,
+                    callbackUrl: $apiCallbackUri,
+                    username: $username,
+                    password: $password
+                );
+
+                $authData = $automation->getAuthorizationCode();
+                $this->code = $authData['code'];
+                $this->session = $authData['session'];
+
+                echo "\n✓ Successfully obtained fresh OAuth code via automation\n";
+            } catch (\Exception $e) {
+                // Fall back to using CODE from ENV if automation fails
+                echo "\n⚠ OAuth automation failed: {$e->getMessage()}\n";
+                echo "Falling back to CODE from ENV\n";
+                $this->code = $_ENV['CODE'];
+                $this->session = $_ENV['SESSION'] ?? '';
+            }
+        } else {
+            // Use manual OAuth code from ENV
+            $this->code = $_ENV['CODE'];
+            $this->session = $_ENV['SESSION'] ?? '';
+        }
 
         $this->api = new SchwabAPI(
             apiKey: $apiKey,
@@ -48,16 +80,25 @@ class CharlesSchwabApiIntegrationTest extends TestCase {
      * @group authentication
      */
     public function testRequestTokenShouldGetToken(): void {
-        $this->api->requestToken();
+        try {
+            $this->api->requestToken();
 
-        $accessToken = $this->api->getAccessToken();
-        $refreshToken = $this->api->getRefreshToken();
-        $expiresIn = $this->api->getExpiresIn();
+            $accessToken = $this->api->getAccessToken();
+            $refreshToken = $this->api->getRefreshToken();
+            $expiresIn = $this->api->getExpiresIn();
 
-        $this->assertNotEmpty($accessToken);
-        $this->assertNotEmpty($refreshToken);
-        $this->assertGreaterThan(0, $expiresIn);
-        $this->assertLessThanOrEqual(1800, $expiresIn); // 30 minutes max
+            $this->assertNotEmpty($accessToken);
+            $this->assertNotEmpty($refreshToken);
+            $this->assertGreaterThan(0, $expiresIn);
+            $this->assertLessThanOrEqual(1800, $expiresIn); // 30 minutes max
+        } catch (\MichaelDrennen\SchwabAPI\Exceptions\RequestException $e) {
+            if (str_contains($e->getMessage(), 'Bad authorization') ||
+                str_contains($e->getMessage(), 'unsupported_token_type') ||
+                str_contains($e->getResponseBody(), 'Bad authorization')) {
+                $this->markTestSkipped('Authorization code expired. Get a fresh code from Schwab OAuth flow.');
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -65,18 +106,27 @@ class CharlesSchwabApiIntegrationTest extends TestCase {
      * @group accounts
      */
     public function testAccountNumbersShouldReturnArray(): void {
-        // First get a token
-        $this->api->requestToken();
+        try {
+            // First get a token
+            $this->api->requestToken();
 
-        $accountNumbers = $this->api->accountNumbers();
+            $accountNumbers = $this->api->accountNumbers();
 
-        $this->assertIsArray($accountNumbers);
-        $this->assertNotEmpty($accountNumbers);
+            $this->assertIsArray($accountNumbers);
+            $this->assertNotEmpty($accountNumbers);
 
-        // Each account should have accountNumber and hashValue
-        foreach ($accountNumbers as $account) {
-            $this->assertArrayHasKey('accountNumber', $account);
-            $this->assertArrayHasKey('hashValue', $account);
+            // Each account should have accountNumber and hashValue
+            foreach ($accountNumbers as $account) {
+                $this->assertArrayHasKey('accountNumber', $account);
+                $this->assertArrayHasKey('hashValue', $account);
+            }
+        } catch (\MichaelDrennen\SchwabAPI\Exceptions\RequestException $e) {
+            if (str_contains($e->getMessage(), 'Bad authorization') ||
+                str_contains($e->getMessage(), 'unsupported_token_type') ||
+                str_contains($e->getResponseBody(), 'Bad authorization')) {
+                $this->markTestSkipped('Authorization code expired. Get a fresh code from Schwab OAuth flow.');
+            }
+            throw $e;
         }
     }
 
@@ -85,16 +135,25 @@ class CharlesSchwabApiIntegrationTest extends TestCase {
      * @group accounts
      */
     public function testAccountsShouldReturnData(): void {
-        $this->api->requestToken();
+        try {
+            $this->api->requestToken();
 
-        $accounts = $this->api->accounts();
+            $accounts = $this->api->accounts();
 
-        $this->assertIsArray($accounts);
-        $this->assertNotEmpty($accounts);
+            $this->assertIsArray($accounts);
+            $this->assertNotEmpty($accounts);
 
-        // Each account should have securitiesAccount
-        foreach ($accounts as $account) {
-            $this->assertArrayHasKey('securitiesAccount', $account);
+            // Each account should have securitiesAccount
+            foreach ($accounts as $account) {
+                $this->assertArrayHasKey('securitiesAccount', $account);
+            }
+        } catch (\MichaelDrennen\SchwabAPI\Exceptions\RequestException $e) {
+            if (str_contains($e->getMessage(), 'Bad authorization') ||
+                str_contains($e->getMessage(), 'unsupported_token_type') ||
+                str_contains($e->getResponseBody(), 'Bad authorization')) {
+                $this->markTestSkipped('Authorization code expired. Get a fresh code from Schwab OAuth flow.');
+            }
+            throw $e;
         }
     }
 
@@ -103,11 +162,20 @@ class CharlesSchwabApiIntegrationTest extends TestCase {
      * @group accounts
      */
     public function testAccountsWithPositionsShouldReturnPositions(): void {
-        $this->api->requestToken();
+        try {
+            $this->api->requestToken();
 
-        $accounts = $this->api->accounts(positions: true);
+            $accounts = $this->api->accounts(positions: true);
 
-        $this->assertIsArray($accounts);
+            $this->assertIsArray($accounts);
+        } catch (\MichaelDrennen\SchwabAPI\Exceptions\RequestException $e) {
+            if (str_contains($e->getMessage(), 'Bad authorization') ||
+                str_contains($e->getMessage(), 'unsupported_token_type') ||
+                str_contains($e->getResponseBody(), 'Bad authorization')) {
+                $this->markTestSkipped('Authorization code expired. Get a fresh code from Schwab OAuth flow.');
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -115,11 +183,20 @@ class CharlesSchwabApiIntegrationTest extends TestCase {
      * @group preferences
      */
     public function testUserPreferenceShouldReturnData(): void {
-        $this->api->requestToken();
+        try {
+            $this->api->requestToken();
 
-        $preferences = $this->api->userPreference();
+            $preferences = $this->api->userPreference();
 
-        $this->assertIsArray($preferences);
+            $this->assertIsArray($preferences);
+        } catch (\MichaelDrennen\SchwabAPI\Exceptions\RequestException $e) {
+            if (str_contains($e->getMessage(), 'Bad authorization') ||
+                str_contains($e->getMessage(), 'unsupported_token_type') ||
+                str_contains($e->getResponseBody(), 'Bad authorization')) {
+                $this->markTestSkipped('Authorization code expired. Get a fresh code from Schwab OAuth flow.');
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -138,11 +215,20 @@ class CharlesSchwabApiIntegrationTest extends TestCase {
      * @group markets
      */
     public function testGetNextOpenDateForMarket(): void {
-        $this->api->requestToken();
+        try {
+            $this->api->requestToken();
 
-        $carbonDate = $this->api->getNextOpenDateForMarket('equity');
+            $carbonDate = $this->api->getNextOpenDateForMarket('equity');
 
-        $this->assertInstanceOf(\Carbon\Carbon::class, $carbonDate);
+            $this->assertInstanceOf(\Carbon\Carbon::class, $carbonDate);
+        } catch (\MichaelDrennen\SchwabAPI\Exceptions\RequestException $e) {
+            if (str_contains($e->getMessage(), 'Bad authorization') ||
+                str_contains($e->getMessage(), 'unsupported_token_type') ||
+                str_contains($e->getResponseBody(), 'Bad authorization')) {
+                $this->markTestSkipped('Authorization code expired. Get a fresh code from Schwab OAuth flow.');
+            }
+            throw $e;
+        }
     }
 
     /**
