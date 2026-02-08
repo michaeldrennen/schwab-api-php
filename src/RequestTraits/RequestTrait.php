@@ -72,6 +72,11 @@ trait RequestTrait {
         if ( 'POST' == $method ) {
             $options[ 'headers' ][ 'Content-Type' ] = 'application/json';
             return $this->client->post( $url, $options );
+        } elseif ( 'PUT' == $method ) {
+            $options[ 'headers' ][ 'Content-Type' ] = 'application/json';
+            return $this->client->put( $url, $options );
+        } elseif ( 'DELETE' == $method ) {
+            return $this->client->delete( $url, $options );
         } else {
             return $this->client->get( $url, $options );
         }

@@ -34,9 +34,9 @@ trait AccountRequests {
      */
     public function accounts( bool $positions = FALSE ): array {
         $suffix = '/trader/v1/accounts';
-        if ( $positions ):
+        if ( $positions ) {
             $suffix .= '?fields=positions';
-        endif;
+        }
         $response = $this->_request( $suffix );
         return $this->json( $response );
     }
@@ -53,10 +53,10 @@ trait AccountRequests {
         /**
          * @var array $account
          */
-        foreach ( $accounts as $i => $account ):
+        foreach ( $accounts as $i => $account ) {
             $accountNumber                      = $account[ 'securitiesAccount' ][ 'accountNumber' ];
             $accountsByNumber[ $accountNumber ] = $account;
-        endforeach;
+        }
         return $accountsByNumber;
     }
 
@@ -70,9 +70,9 @@ trait AccountRequests {
      */
     public function accountByNumber( int $accountNumber ): array {
         $accountsByNumber = $this->accountsByNumber();
-        if ( isset( $accountsByNumber[ $accountNumber ] ) ):
+        if ( isset( $accountsByNumber[ $accountNumber ] ) ) {
             return $accountsByNumber[ $accountNumber ];
-        endif;
+        }
 
         throw new \Exception( "Unable to find account with accountNumber: $accountNumber" );
     }
@@ -88,10 +88,10 @@ trait AccountRequests {
     public function account( string $hashValueOfAccountNumber, array $fields = [] ): array {
         $suffix = '/trader/v1/accounts/' . $hashValueOfAccountNumber;
 
-        if ( $fields ):
+        if ( $fields ) {
             $suffix .= '?fields=' . implode( ',', $fields );
             //$suffix .= '?' . http_build_query( $fields );
-        endif;
+        }
 
         $response = $this->_request( $suffix );
         return $this->json( $response );
@@ -102,9 +102,9 @@ trait AccountRequests {
         $positions = [];
         $account   = $this->account( $hashValueOfAccountNumber, [ 'positions' ] );
 
-        if ( !isset ( $account[ 'securitiesAccount' ][ 'positions' ] ) ) :
+        if ( !isset ( $account[ 'securitiesAccount' ][ 'positions' ] ) ) {
             return [];
-        endif;
+        }
 
 
         /**
@@ -133,14 +133,14 @@ trait AccountRequests {
         //    "previousSessionLongQuantity" => 2.0
         //    "currentDayCost" => 0.0
         //  ]
-        foreach ( $account[ 'securitiesAccount' ][ 'positions' ] as $position ) :
-            if ( $position[ 'longQuantity' ] <= 0 ):
+        foreach ( $account[ 'securitiesAccount' ][ 'positions' ] as $position ) {
+            if ( $position[ 'longQuantity' ] <= 0 ) {
                 continue;
-            endif;
+            }
 
-            if ( 'EQUITY' != $position[ 'instrument' ][ 'assetType' ] ):
+            if ( 'EQUITY' != $position[ 'instrument' ][ 'assetType' ] ) {
                 continue;
-            endif;
+            }
 
             // For this method, I am only looking at simple EQUITY securities.
             // Where there will only be ONE instrument associated with this position.
@@ -152,7 +152,7 @@ trait AccountRequests {
             $position[ 'netChange' ] = $position[ 'instrument' ][ 'netChange' ];
             unset( $position[ 'instrument' ] );
             $positions[] = $position;
-        endforeach;
+        }
 
         return $positions;
     }

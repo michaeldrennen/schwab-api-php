@@ -76,33 +76,33 @@ trait OrderRequests {
         $suffix = '/trader/v1/orders';
 
         // This Exception is just to help Developers keep from getting confused or wasting time.
-        if ( $fromTime xor $toTime ):
+        if ( $fromTime xor $toTime ) {
             throw new \Exception( "If you set fromTime, you are required to set toTime as well." );
-        endif;
+        }
 
         $queryParameters = [];
 
-        if ( $fromTime && $toTime ):
+        if ( $fromTime && $toTime ) {
             $queryParameters[ 'fromEnteredTime' ] = $fromTime->toIso8601String();
             $queryParameters[ 'toEnteredTime' ]   = $toTime->toIso8601String();
-        endif;
+        }
 
-        if ( $status ):
+        if ( $status ) {
             $status = strtoupper( $status );
-            if ( !in_array( $status, self::VALID_STATUSES ) ):
+            if ( !in_array( $status, self::VALID_STATUSES ) ) {
                 throw new \Exception( "Invalid status. Your input of '" . $status . "' is not in the array of validStatuses." );
-            endif;
+            }
 
             $queryParameters[ 'status' ] = $status;
-        endif;
+        }
 
-        if ( $maxResults ):
+        if ( $maxResults ) {
             $queryParameters[ 'maxResults' ] = $maxResults;
-        endif;
+        }
 
-        if ( $queryParameters ):
+        if ( $queryParameters ) {
             $suffix .= '?' . http_build_query( $queryParameters );
-        endif;
+        }
 
         $response = $this->_request( $suffix );
         return $this->json( $response );
@@ -132,33 +132,33 @@ trait OrderRequests {
         $suffix = '/trader/v1/accounts/' . $hashValueOfAccountNumber . '/orders';
 
         // This Exception is just to help Developers keep from getting confused or wasting time.
-        if ( $fromTime xor $toTime ):
+        if ( $fromTime xor $toTime ) {
             throw new \Exception( "If you set fromTime, you are required to set toTime as well." );
-        endif;
+        }
 
         $queryParameters = [];
 
-        if ( $maxResults ):
+        if ( $maxResults ) {
             $queryParameters[ 'maxResults' ] = $maxResults;
-        endif;
+        }
 
-        if ( $fromTime && $toTime ):
+        if ( $fromTime && $toTime ) {
             $queryParameters[ 'fromEnteredTime' ] = $fromTime->toIso8601String();
             $queryParameters[ 'toEnteredTime' ]   = $toTime->toIso8601String();
-        endif;
+        }
 
-        if ( $status ):
+        if ( $status ) {
             $status = strtoupper( $status );
-            if ( !in_array( $status, self::VALID_STATUSES ) ):
+            if ( !in_array( $status, self::VALID_STATUSES ) ) {
                 throw new \Exception( "Invalid status. Your input of '" . $status . "' is not in the array of validStatuses." );
-            endif;
+            }
 
             $queryParameters[ 'status' ] = $status;
-        endif;
+        }
 
-        if ( $queryParameters ):
+        if ( $queryParameters ) {
             $suffix .= '?' . http_build_query( $queryParameters );
-        endif;
+        }
 
         $response = $this->_request( $suffix );
         return $this->json( $response );
@@ -223,6 +223,68 @@ trait OrderRequests {
                                      [ 'body' => $payload ],
                                      [] );
         return $this->responseCode( $response );
+    }
+
+
+    /**
+     * Replace an order for a specific account
+     * This replaces an existing order with a new order
+     *
+     * @param string $hashValueOfAccountNumber The encrypted account hash value
+     * @param int    $orderId                  The order ID to replace
+     * @param string $orderPayload             JSON payload for the new order
+     *
+     * @return int HTTP response code (200 on success)
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function replaceOrder( string $hashValueOfAccountNumber,
+                                  int    $orderId,
+                                  string $orderPayload ): int {
+        $suffix = '/trader/v1/accounts/' . $hashValueOfAccountNumber . '/orders/' . $orderId;
+
+        $response = $this->_request( $suffix, 'PUT',
+                                     [ 'body' => $orderPayload ],
+                                     [] );
+        return $this->responseCode( $response );
+    }
+
+
+    /**
+     * Cancel an order for a specific account
+     *
+     * @param string $hashValueOfAccountNumber The encrypted account hash value
+     * @param int    $orderId                  The order ID to cancel
+     *
+     * @return int HTTP response code (200 on success)
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function cancelOrder( string $hashValueOfAccountNumber,
+                                 int    $orderId ): int {
+        $suffix = '/trader/v1/accounts/' . $hashValueOfAccountNumber . '/orders/' . $orderId;
+
+        $response = $this->_request( $suffix, 'DELETE' );
+        return $this->responseCode( $response );
+    }
+
+
+    /**
+     * Preview an order for a specific account before placing it
+     * This allows you to see the impact of an order without actually placing it
+     *
+     * @param string $hashValueOfAccountNumber The encrypted account hash value
+     * @param string $orderPayload             JSON payload for the order to preview
+     *
+     * @return array Preview order response with projected balances and commissions
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function previewOrder( string $hashValueOfAccountNumber,
+                                  string $orderPayload ): array {
+        $suffix = '/trader/v1/accounts/' . $hashValueOfAccountNumber . '/previewOrder';
+
+        $response = $this->_request( $suffix, 'POST',
+                                     [ 'body' => $orderPayload ],
+                                     [] );
+        return $this->json( $response );
     }
 
 }
