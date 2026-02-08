@@ -13,30 +13,30 @@ class RequestException extends \Exception {
 
 
     /**
-     * @var string Ex: unsupported_token_type
+     * @var string|null Ex: unsupported_token_type
      */
-    protected string $errorLabel;
+    protected ?string $errorLabel = null;
 
     /**
-     * @var int Ex: 400
+     * @var int|null Ex: 400
      */
-    protected int $errorCode;
+    protected ?int $errorCode = null;
 
     /**
-     * @var string Ex: Bad Request
+     * @var string|null Ex: Bad Request
      */
-    protected string $errorName;
+    protected ?string $errorName = null;
 
 
     /**
-     * @var string Ex: invalid_request
+     * @var string|null Ex: invalid_request
      */
-    protected string $errorTag;
+    protected ?string $errorTag = null;
 
     /**
-     * @var string Ex: Bad authorization code: String length must be a multiple of four.
+     * @var string|null Ex: Bad authorization code: String length must be a multiple of four.
      */
-    protected string $errorDescription;
+    protected ?string $errorDescription = null;
 
 
     /**
@@ -59,20 +59,55 @@ class RequestException extends \Exception {
     }
 
     protected function _parseRawResponseBody(): void {
-        $jsonResponse          = json_decode( $this->rawResponseBody, TRUE );
-        $this->errorLabel      = $jsonResponse[ 'error' ];
-        $errorDescription      = $jsonResponse[ 'error_description' ];
-        $errorDescriptionParts = preg_split( '/:/', $errorDescription, 2 );
+        // Only parse if we have a response body
+        if (empty($this->rawResponseBody)) {
+            return;
+        }
 
-        $matches = [];
-        preg_match( '/(\d{3}) (.*)/', $errorDescriptionParts[ 0 ], $matches );
-        $this->errorCode         = $matches[ 1 ];
-        $this->errorName         = $matches[ 2 ];
-        $jsonStringWithErrorData = trim( $errorDescriptionParts[ 1 ], ' ' );
-        $jsonStringWithErrorData = trim( $jsonStringWithErrorData, '"' );
-        $errorData               = json_decode( $jsonStringWithErrorData, TRUE );
-        $errorData               = array_map( 'trim', $errorData );
-        $this->errorDescription  = $errorData[ 'error_description' ];
-        $this->errorTag          = $errorData[ 'error' ];
+        $jsonResponse = json_decode($this->rawResponseBody, true);
+
+        // Only parse if valid JSON
+        if (!is_array($jsonResponse)) {
+            return;
+        }
+
+        // Try to parse Schwab-specific error format
+        if (isset($jsonResponse['error'])) {
+            $this->errorLabel = $jsonResponse['error'];
+        }
+
+        if (isset($jsonResponse['error_description'])) {
+            $errorDescription = $jsonResponse['error_description'];
+            $errorDescriptionParts = preg_split('/:/', $errorDescription, 2);
+
+            $matches = [];
+            if (preg_match('/(\d{3}) (.*)/', $errorDescriptionParts[0], $matches)) {
+                $this->errorCode = (int) $matches[1];
+                $this->errorName = $matches[2];
+            }
+
+            if (isset($errorDescriptionParts[1])) {
+                $jsonStringWithErrorData = trim($errorDescriptionParts[1], ' "');
+                $errorData = json_decode($jsonStringWithErrorData, true);
+
+                if (is_array($errorData)) {
+                    if (isset($errorData['error_description'])) {
+                        $this->errorDescription = trim($errorData['error_description']);
+                    }
+                    if (isset($errorData['error'])) {
+                        $this->errorTag = trim($errorData['error']);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the raw response body
+     *
+     * @return string
+     */
+    public function getResponseBody(): string {
+        return $this->rawResponseBody;
     }
 }
