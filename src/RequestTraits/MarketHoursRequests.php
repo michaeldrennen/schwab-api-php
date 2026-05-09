@@ -58,7 +58,7 @@ trait MarketHoursRequests {
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Exception
      */
-    public function markets( array $markets = self::MARKETS, Carbon $date = NULL ): array {
+    public function markets( array $markets = self::MARKETS, ?Carbon $date = NULL ): array {
         $suffix = '/marketdata/v1/markets';
 
         $markets = array_map( 'strtolower', $markets );
