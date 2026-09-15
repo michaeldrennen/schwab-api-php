@@ -1,0 +1,2408 @@
+{
+  "metadata": {
+    "title": "Charles Schwab Trader API Documentation",
+    "description": "Comprehensive, structured API documentation extracted from Schwab Trader API HTML documentation",
+    "documentation_version": "1.0.0",
+    "api_documentation_version": "19.2.15",
+    "generated": "2026-09-14",
+    "source_files": [
+      "Accounts_and_Trading_Production.html",
+      "Market_Data_Production.html"
+    ],
+    "contact": {
+      "name": "Schwab Trader API team",
+      "url": "https://developer.schwab.com"
+    },
+    "license": {
+      "name": "Schwab API License",
+      "url": "https://developer.schwab.com/license"
+    }
+  },
+  "apis": [
+    {
+      "name": "Accounts and Trading API",
+      "version": "19.2.15",
+      "description": "Schwab Trader API provides endpoints for account management, order execution, and trading operations. Enables access to account balances, positions, order history, and executing trades.",
+      "contact": {
+        "name": "Schwab Trader API team"
+      },
+      "license": {
+        "name": "Schwab API License",
+        "url": "https://developer.schwab.com"
+      },
+      "servers": [
+        {
+          "url": "https://api.schwabapi.com",
+          "description": "Production API server"
+        }
+      ],
+      "authentication": {
+        "type": "OAuth2",
+        "description": "OAuth2 authentication with scopes for different operations",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.schwabapi.com/oauth/authorize",
+            "tokenUrl": "https://auth.schwabapi.com/oauth/token",
+            "scopes": {
+              "PlaceTrades": "Place and manage trades",
+              "AccountAccess": "Access account information",
+              "MoveMoney": "Move money between accounts"
+            }
+          }
+        }
+      },
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/accounts/accountNumbers",
+          "operationId": "get_accounts_accountNumbers",
+          "summary": "Get list of account numbers and their encrypted values",
+          "description": "Get list of account numbers and their encrypted values",
+          "tags": [
+            "Accounts"
+          ],
+          "parameters": [],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/accounts",
+          "operationId": "get_accounts",
+          "summary": "Get linked account(s) balances and positions for the logged in user.",
+          "description": "Get linked account(s) balances and positions for the logged in user.",
+          "tags": [
+            "Accounts"
+          ],
+          "parameters": [],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/accounts/{accountNumber}",
+          "operationId": "get_accounts_accountNumber",
+          "summary": "Get a specific account balance and positions for the logged in user.",
+          "description": "Get a specific account balance and positions for the logged in user.",
+          "tags": [
+            "Accounts"
+          ],
+          "parameters": [
+            {
+              "name": "accountNumber",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The accountNumber identifier"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/accounts/{accountNumber}/orders",
+          "operationId": "get_accounts_accountNumber_orders",
+          "summary": "Get all orders for a specific account.",
+          "description": "Get all orders for a specific account.",
+          "tags": [
+            "Accounts",
+            "Orders"
+          ],
+          "parameters": [
+            {
+              "name": "accountNumber",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The accountNumber identifier"
+            },
+            {
+              "name": "maxResults",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "integer",
+                "default": 100
+              },
+              "description": "Maximum number of results to return"
+            },
+            {
+              "name": "status",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "OPEN",
+                  "CLOSED",
+                  "CANCELLED"
+                ]
+              },
+              "description": "Filter orders by status"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/accounts/{accountNumber}/orders",
+          "operationId": "post_accounts_accountNumber_orders",
+          "summary": "Place order for a specific account.",
+          "description": "Place order for a specific account.",
+          "tags": [
+            "Accounts",
+            "Orders"
+          ],
+          "parameters": [
+            {
+              "name": "accountNumber",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The accountNumber identifier"
+            }
+          ],
+          "request_body": {
+            "required": true,
+            "description": "Order details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Order request"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/accounts/{accountNumber}/orders/{orderId}",
+          "operationId": "get_accounts_accountNumber_orders_orderId",
+          "summary": "Get a specific order by its ID, for a specific account",
+          "description": "Get a specific order by its ID, for a specific account",
+          "tags": [
+            "Accounts",
+            "Orders"
+          ],
+          "parameters": [
+            {
+              "name": "accountNumber",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The accountNumber identifier"
+            },
+            {
+              "name": "orderId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The orderId identifier"
+            },
+            {
+              "name": "maxResults",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "integer",
+                "default": 100
+              },
+              "description": "Maximum number of results to return"
+            },
+            {
+              "name": "status",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "OPEN",
+                  "CLOSED",
+                  "CANCELLED"
+                ]
+              },
+              "description": "Filter orders by status"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "path": "/accounts/{accountNumber}/orders/{orderId}",
+          "operationId": "delete_accounts_accountNumber_orders_orderId",
+          "summary": "Cancel an order for a specific account",
+          "description": "Cancel an order for a specific account",
+          "tags": [
+            "Accounts",
+            "Orders"
+          ],
+          "parameters": [
+            {
+              "name": "accountNumber",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The accountNumber identifier"
+            },
+            {
+              "name": "orderId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The orderId identifier"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "PUT",
+          "path": "/accounts/{accountNumber}/orders/{orderId}",
+          "operationId": "put_accounts_accountNumber_orders_orderId",
+          "summary": "Replace order for a specific account",
+          "description": "Replace order for a specific account",
+          "tags": [
+            "Accounts",
+            "Orders"
+          ],
+          "parameters": [
+            {
+              "name": "accountNumber",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The accountNumber identifier"
+            },
+            {
+              "name": "orderId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The orderId identifier"
+            }
+          ],
+          "request_body": {
+            "required": true,
+            "description": "Order details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Order request"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/orders",
+          "operationId": "get_orders",
+          "summary": "Get all orders for all accounts",
+          "description": "Get all orders for all accounts",
+          "tags": [
+            "Orders"
+          ],
+          "parameters": [
+            {
+              "name": "maxResults",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "integer",
+                "default": 100
+              },
+              "description": "Maximum number of results to return"
+            },
+            {
+              "name": "status",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "OPEN",
+                  "CLOSED",
+                  "CANCELLED"
+                ]
+              },
+              "description": "Filter orders by status"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "path": "/accounts/{accountNumber}/previewOrder",
+          "operationId": "post_accounts_accountNumber_previewOrder",
+          "summary": "Preview order for a specific account.",
+          "description": "Preview order for a specific account.",
+          "tags": [
+            "Accounts"
+          ],
+          "parameters": [
+            {
+              "name": "accountNumber",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The accountNumber identifier"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/accounts/{accountNumber}/transactions",
+          "operationId": "get_accounts_accountNumber_transactions",
+          "summary": "Get all transactions information for a specific account.",
+          "description": "Get all transactions information for a specific account.",
+          "tags": [
+            "Accounts",
+            "Transactions"
+          ],
+          "parameters": [
+            {
+              "name": "accountNumber",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The accountNumber identifier"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/accounts/{accountNumber}/transactions/{transactionId}",
+          "operationId": "get_accounts_accountNumber_transactions_transactionId",
+          "summary": "Get specific transaction information for a specific account",
+          "description": "Get specific transaction information for a specific account",
+          "tags": [
+            "Accounts",
+            "Transactions"
+          ],
+          "parameters": [
+            {
+              "name": "accountNumber",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The accountNumber identifier"
+            },
+            {
+              "name": "transactionId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The transactionId identifier"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/userPreference",
+          "operationId": "get_userPreference",
+          "summary": "Get user preference information for the logged in user.",
+          "description": "Get user preference information for the logged in user.",
+          "tags": [
+            "User Preferences"
+          ],
+          "parameters": [],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        }
+      ],
+      "schemas": {
+        "AccountNumberHash": {
+          "name": "AccountNumberHash",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing AccountNumberHash"
+        },
+        "session": {
+          "name": "session",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing session"
+        },
+        "duration": {
+          "name": "duration",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing duration"
+        },
+        "orderType": {
+          "name": "orderType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing orderType"
+        },
+        "orderTypeRequest": {
+          "name": "orderTypeRequest",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing orderTypeRequest"
+        },
+        "complexOrderStrategyType": {
+          "name": "complexOrderStrategyType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing complexOrderStrategyType"
+        },
+        "requestedDestination": {
+          "name": "requestedDestination",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing requestedDestination"
+        },
+        "stopPriceLinkBasis": {
+          "name": "stopPriceLinkBasis",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing stopPriceLinkBasis"
+        },
+        "stopPriceLinkType": {
+          "name": "stopPriceLinkType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing stopPriceLinkType"
+        },
+        "stopPriceOffset": {
+          "name": "stopPriceOffset",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing stopPriceOffset"
+        },
+        "stopType": {
+          "name": "stopType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing stopType"
+        },
+        "priceLinkBasis": {
+          "name": "priceLinkBasis",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing priceLinkBasis"
+        },
+        "priceLinkType": {
+          "name": "priceLinkType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing priceLinkType"
+        },
+        "taxLotMethod": {
+          "name": "taxLotMethod",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing taxLotMethod"
+        },
+        "specialInstruction": {
+          "name": "specialInstruction",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing specialInstruction"
+        },
+        "orderStrategyType": {
+          "name": "orderStrategyType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing orderStrategyType"
+        },
+        "status": {
+          "name": "status",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing status"
+        },
+        "amountIndicator": {
+          "name": "amountIndicator",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing amountIndicator"
+        },
+        "settlementInstruction": {
+          "name": "settlementInstruction",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing settlementInstruction"
+        },
+        "OrderStrategy": {
+          "name": "OrderStrategy",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OrderStrategy"
+        },
+        "OrderLeg": {
+          "name": "OrderLeg",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OrderLeg"
+        },
+        "OrderBalance": {
+          "name": "OrderBalance",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OrderBalance"
+        },
+        "OrderValidationResult": {
+          "name": "OrderValidationResult",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OrderValidationResult"
+        },
+        "OrderValidationDetail": {
+          "name": "OrderValidationDetail",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OrderValidationDetail"
+        },
+        "APIRuleAction": {
+          "name": "APIRuleAction",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing APIRuleAction"
+        },
+        "CommissionAndFee": {
+          "name": "CommissionAndFee",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing CommissionAndFee"
+        },
+        "Commission": {
+          "name": "Commission",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Commission"
+        },
+        "CommissionLeg": {
+          "name": "CommissionLeg",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing CommissionLeg"
+        },
+        "CommissionValue": {
+          "name": "CommissionValue",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing CommissionValue"
+        },
+        "Fees": {
+          "name": "Fees",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Fees"
+        },
+        "FeeLeg": {
+          "name": "FeeLeg",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing FeeLeg"
+        },
+        "FeeValue": {
+          "name": "FeeValue",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing FeeValue"
+        },
+        "FeeType": {
+          "name": "FeeType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing FeeType"
+        },
+        "Account": {
+          "name": "Account",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Account"
+        },
+        "DateParam": {
+          "name": "DateParam",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing DateParam"
+        },
+        "Order": {
+          "name": "Order",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Order"
+        },
+        "OrderRequest": {
+          "name": "OrderRequest",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OrderRequest"
+        },
+        "PreviewOrder": {
+          "name": "PreviewOrder",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing PreviewOrder"
+        },
+        "OrderActivity": {
+          "name": "OrderActivity",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OrderActivity"
+        },
+        "ExecutionLeg": {
+          "name": "ExecutionLeg",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ExecutionLeg"
+        },
+        "Position": {
+          "name": "Position",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Position"
+        },
+        "ServiceError": {
+          "name": "ServiceError",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ServiceError"
+        },
+        "OrderLegCollection": {
+          "name": "OrderLegCollection",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OrderLegCollection"
+        },
+        "SecuritiesAccount": {
+          "name": "SecuritiesAccount",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing SecuritiesAccount"
+        },
+        "SecuritiesAccountBase": {
+          "name": "SecuritiesAccountBase",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing SecuritiesAccountBase"
+        },
+        "MarginAccount": {
+          "name": "MarginAccount",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing MarginAccount"
+        },
+        "MarginInitialBalance": {
+          "name": "MarginInitialBalance",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing MarginInitialBalance"
+        },
+        "MarginBalance": {
+          "name": "MarginBalance",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing MarginBalance"
+        },
+        "CashAccount": {
+          "name": "CashAccount",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing CashAccount"
+        },
+        "CashInitialBalance": {
+          "name": "CashInitialBalance",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing CashInitialBalance"
+        },
+        "CashBalance": {
+          "name": "CashBalance",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing CashBalance"
+        },
+        "TransactionBaseInstrument": {
+          "name": "TransactionBaseInstrument",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing TransactionBaseInstrument"
+        },
+        "AccountsBaseInstrument": {
+          "name": "AccountsBaseInstrument",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing AccountsBaseInstrument"
+        },
+        "AccountsInstrument": {
+          "name": "AccountsInstrument",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing AccountsInstrument"
+        },
+        "TransactionInstrument": {
+          "name": "TransactionInstrument",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing TransactionInstrument"
+        },
+        "TransactionCashEquivalent": {
+          "name": "TransactionCashEquivalent",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing TransactionCashEquivalent"
+        },
+        "CollectiveInvestment": {
+          "name": "CollectiveInvestment",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing CollectiveInvestment"
+        },
+        "instruction": {
+          "name": "instruction",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing instruction"
+        },
+        "assetType": {
+          "name": "assetType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing assetType"
+        },
+        "Currency": {
+          "name": "Currency",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Currency"
+        },
+        "TransactionEquity": {
+          "name": "TransactionEquity",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing TransactionEquity"
+        },
+        "TransactionFixedIncome": {
+          "name": "TransactionFixedIncome",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing TransactionFixedIncome"
+        },
+        "Forex": {
+          "name": "Forex",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Forex"
+        },
+        "Future": {
+          "name": "Future",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Future"
+        },
+        "Index": {
+          "name": "Index",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Index"
+        },
+        "TransactionMutualFund": {
+          "name": "TransactionMutualFund",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing TransactionMutualFund"
+        },
+        "TransactionOption": {
+          "name": "TransactionOption",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing TransactionOption"
+        },
+        "Product": {
+          "name": "Product",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Product"
+        },
+        "AccountCashEquivalent": {
+          "name": "AccountCashEquivalent",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing AccountCashEquivalent"
+        },
+        "AccountEquity": {
+          "name": "AccountEquity",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing AccountEquity"
+        },
+        "AccountFixedIncome": {
+          "name": "AccountFixedIncome",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing AccountFixedIncome"
+        },
+        "AccountMutualFund": {
+          "name": "AccountMutualFund",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing AccountMutualFund"
+        },
+        "AccountOption": {
+          "name": "AccountOption",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing AccountOption"
+        },
+        "AccountAPIOptionDeliverable": {
+          "name": "AccountAPIOptionDeliverable",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing AccountAPIOptionDeliverable"
+        },
+        "TransactionAPIOptionDeliverable": {
+          "name": "TransactionAPIOptionDeliverable",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing TransactionAPIOptionDeliverable"
+        },
+        "apiOrderStatus": {
+          "name": "apiOrderStatus",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing apiOrderStatus"
+        },
+        "TransactionType": {
+          "name": "TransactionType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing TransactionType"
+        },
+        "Transaction": {
+          "name": "Transaction",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Transaction"
+        },
+        "UserDetails": {
+          "name": "UserDetails",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing UserDetails"
+        },
+        "TransferItem": {
+          "name": "TransferItem",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing TransferItem"
+        },
+        "UserPreference": {
+          "name": "UserPreference",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing UserPreference"
+        },
+        "UserPreferenceAccount": {
+          "name": "UserPreferenceAccount",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing UserPreferenceAccount"
+        },
+        "StreamerInfo": {
+          "name": "StreamerInfo",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing StreamerInfo"
+        },
+        "Offer": {
+          "name": "Offer",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Offer"
+        }
+      },
+      "tags": [
+        {
+          "name": "Accounts",
+          "description": "Operations related to accounts"
+        },
+        {
+          "name": "Orders",
+          "description": "Operations related to orders"
+        },
+        {
+          "name": "Transactions",
+          "description": "Operations related to transactions"
+        },
+        {
+          "name": "User Preferences",
+          "description": "Operations related to user preferences"
+        }
+      ]
+    },
+    {
+      "name": "Market Data API",
+      "version": "19.2.15",
+      "description": "Schwab Market Data API provides real-time and historical market data including stock quotes, option chains, price history, market hours, and market movers.",
+      "contact": {
+        "name": "Schwab Trader API team"
+      },
+      "license": {
+        "name": "Schwab API License",
+        "url": "https://developer.schwab.com"
+      },
+      "servers": [
+        {
+          "url": "https://api.schwabapi.com",
+          "description": "Production API server"
+        }
+      ],
+      "authentication": {
+        "type": "OAuth2",
+        "description": "OAuth2 authentication with scopes for different operations",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.schwabapi.com/oauth/authorize",
+            "tokenUrl": "https://auth.schwabapi.com/oauth/token",
+            "scopes": {
+              "PlaceTrades": "Place and manage trades",
+              "AccountAccess": "Access account information",
+              "MoveMoney": "Move money between accounts"
+            }
+          }
+        }
+      },
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/quotes",
+          "operationId": "get_quotes",
+          "summary": "Get Quotes by list of symbols.",
+          "description": "Get Quotes by list of symbols.",
+          "tags": [
+            "Quotes"
+          ],
+          "parameters": [
+            {
+              "name": "symbols",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Comma-separated list of symbols"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/{symbol_id}/quotes",
+          "operationId": "get_symbol_id_quotes",
+          "summary": "Get Quote by single symbol.",
+          "description": "Get Quote by single symbol.",
+          "tags": [
+            "Quotes"
+          ],
+          "parameters": [
+            {
+              "name": "symbols",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "Comma-separated list of symbols"
+            },
+            {
+              "name": "symbol_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The symbol_id identifier"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/chains",
+          "operationId": "get_chains",
+          "summary": "Get option chain for an optionable Symbol",
+          "description": "Get option chain for an optionable Symbol",
+          "tags": [
+            "Option Chains"
+          ],
+          "parameters": [],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/expirationchain",
+          "operationId": "get_expirationchain",
+          "summary": "Get option expiration chain for an optionable symbol",
+          "description": "Get option expiration chain for an optionable symbol",
+          "tags": [
+            "Expiration Chain"
+          ],
+          "parameters": [],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/pricehistory",
+          "operationId": "get_pricehistory",
+          "summary": "Get PriceHistory for a single symbol and date ranges.",
+          "description": "Get PriceHistory for a single symbol and date ranges.",
+          "tags": [
+            "Price History"
+          ],
+          "parameters": [],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/movers/{symbol_id}",
+          "operationId": "get_movers_symbol_id",
+          "summary": "Get Movers for a specific index.",
+          "description": "Get Movers for a specific index.",
+          "tags": [
+            "Movers"
+          ],
+          "parameters": [
+            {
+              "name": "symbol_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The symbol_id identifier"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/markets",
+          "operationId": "get_markets",
+          "summary": "Get Market Hours for different markets.",
+          "description": "Get Market Hours for different markets.",
+          "tags": [
+            "Markets"
+          ],
+          "parameters": [],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/markets/{market_id}",
+          "operationId": "get_markets_market_id",
+          "summary": "Get Market Hours for a single market.",
+          "description": "Get Market Hours for a single market.",
+          "tags": [
+            "Markets"
+          ],
+          "parameters": [
+            {
+              "name": "market_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The market_id identifier"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/instruments",
+          "operationId": "get_instruments",
+          "summary": "Get Instruments by symbols and projections.",
+          "description": "Get Instruments by symbols and projections.",
+          "tags": [
+            "Instruments"
+          ],
+          "parameters": [],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "/instruments/{cusip_id}",
+          "operationId": "get_instruments_cusip_id",
+          "summary": "Get Instrument by specific cusip",
+          "description": "Get Instrument by specific cusip",
+          "tags": [
+            "Instruments"
+          ],
+          "parameters": [
+            {
+              "name": "cusip_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "description": "The cusip_id identifier"
+            }
+          ],
+          "request_body": null,
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {}
+              }
+            },
+            "400": {
+              "description": "Bad request - invalid parameters"
+            },
+            "401": {
+              "description": "Unauthorized - authentication required"
+            },
+            "403": {
+              "description": "Forbidden - insufficient permissions"
+            },
+            "404": {
+              "description": "Not found - resource does not exist"
+            },
+            "429": {
+              "description": "Rate limit exceeded"
+            }
+          },
+          "security": [
+            {
+              "OAuth2": [
+                "PlaceTrades",
+                "AccountAccess"
+              ]
+            }
+          ]
+        }
+      ],
+      "schemas": {
+        "Bond": {
+          "name": "Bond",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Bond"
+        },
+        "FundamentalInst": {
+          "name": "FundamentalInst",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing FundamentalInst"
+        },
+        "Instrument": {
+          "name": "Instrument",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Instrument"
+        },
+        "InstrumentResponse": {
+          "name": "InstrumentResponse",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing InstrumentResponse"
+        },
+        "Hours": {
+          "name": "Hours",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Hours"
+        },
+        "Interval": {
+          "name": "Interval",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Interval"
+        },
+        "Screener": {
+          "name": "Screener",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Screener"
+        },
+        "Candle": {
+          "name": "Candle",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Candle"
+        },
+        "CandleList": {
+          "name": "CandleList",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing CandleList"
+        },
+        "EquityResponse": {
+          "name": "EquityResponse",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing EquityResponse"
+        },
+        "QuoteError": {
+          "name": "QuoteError",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteError"
+        },
+        "ExtendedMarket": {
+          "name": "ExtendedMarket",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ExtendedMarket"
+        },
+        "ForexResponse": {
+          "name": "ForexResponse",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ForexResponse"
+        },
+        "Fundamental": {
+          "name": "Fundamental",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Fundamental"
+        },
+        "FutureOptionResponse": {
+          "name": "FutureOptionResponse",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing FutureOptionResponse"
+        },
+        "FutureResponse": {
+          "name": "FutureResponse",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing FutureResponse"
+        },
+        "IndexResponse": {
+          "name": "IndexResponse",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing IndexResponse"
+        },
+        "MutualFundResponse": {
+          "name": "MutualFundResponse",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing MutualFundResponse"
+        },
+        "OptionResponse": {
+          "name": "OptionResponse",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OptionResponse"
+        },
+        "QuoteEquity": {
+          "name": "QuoteEquity",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteEquity"
+        },
+        "QuoteForex": {
+          "name": "QuoteForex",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteForex"
+        },
+        "QuoteFuture": {
+          "name": "QuoteFuture",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteFuture"
+        },
+        "QuoteFutureOption": {
+          "name": "QuoteFutureOption",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteFutureOption"
+        },
+        "QuoteIndex": {
+          "name": "QuoteIndex",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteIndex"
+        },
+        "QuoteMutualFund": {
+          "name": "QuoteMutualFund",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteMutualFund"
+        },
+        "QuoteOption": {
+          "name": "QuoteOption",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteOption"
+        },
+        "QuoteRequest": {
+          "name": "QuoteRequest",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteRequest"
+        },
+        "QuoteResponse": {
+          "name": "QuoteResponse",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteResponse"
+        },
+        "QuoteResponseObject": {
+          "name": "QuoteResponseObject",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteResponseObject"
+        },
+        "ReferenceEquity": {
+          "name": "ReferenceEquity",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ReferenceEquity"
+        },
+        "ReferenceForex": {
+          "name": "ReferenceForex",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ReferenceForex"
+        },
+        "ReferenceFuture": {
+          "name": "ReferenceFuture",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ReferenceFuture"
+        },
+        "ReferenceFutureOption": {
+          "name": "ReferenceFutureOption",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ReferenceFutureOption"
+        },
+        "ReferenceIndex": {
+          "name": "ReferenceIndex",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ReferenceIndex"
+        },
+        "ReferenceMutualFund": {
+          "name": "ReferenceMutualFund",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ReferenceMutualFund"
+        },
+        "ReferenceOption": {
+          "name": "ReferenceOption",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ReferenceOption"
+        },
+        "RegularMarket": {
+          "name": "RegularMarket",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing RegularMarket"
+        },
+        "AssetMainType": {
+          "name": "AssetMainType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing AssetMainType"
+        },
+        "EquityAssetSubType": {
+          "name": "EquityAssetSubType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing EquityAssetSubType"
+        },
+        "MutualFundAssetSubType": {
+          "name": "MutualFundAssetSubType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing MutualFundAssetSubType"
+        },
+        "ContractType": {
+          "name": "ContractType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ContractType"
+        },
+        "SettlementType": {
+          "name": "SettlementType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing SettlementType"
+        },
+        "ExpirationType": {
+          "name": "ExpirationType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ExpirationType"
+        },
+        "FundStrategy": {
+          "name": "FundStrategy",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing FundStrategy"
+        },
+        "ExerciseType": {
+          "name": "ExerciseType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ExerciseType"
+        },
+        "DivFreq": {
+          "name": "DivFreq",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing DivFreq"
+        },
+        "QuoteType": {
+          "name": "QuoteType",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing QuoteType"
+        },
+        "ErrorResponse": {
+          "name": "ErrorResponse",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ErrorResponse"
+        },
+        "Error": {
+          "name": "Error",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Error"
+        },
+        "ErrorSource": {
+          "name": "ErrorSource",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ErrorSource"
+        },
+        "OptionChain": {
+          "name": "OptionChain",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OptionChain"
+        },
+        "OptionContractMap": {
+          "name": "OptionContractMap",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OptionContractMap"
+        },
+        "Underlying": {
+          "name": "Underlying",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Underlying"
+        },
+        "OptionDeliverables": {
+          "name": "OptionDeliverables",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OptionDeliverables"
+        },
+        "OptionContract": {
+          "name": "OptionContract",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing OptionContract"
+        },
+        "ExpirationChain": {
+          "name": "ExpirationChain",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing ExpirationChain"
+        },
+        "Expiration": {
+          "name": "Expiration",
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "description": "Data model representing Expiration"
+        }
+      },
+      "tags": [
+        {
+          "name": "Expiration Chain",
+          "description": "Operations related to expiration chain"
+        },
+        {
+          "name": "Instruments",
+          "description": "Operations related to instruments"
+        },
+        {
+          "name": "Markets",
+          "description": "Operations related to markets"
+        },
+        {
+          "name": "Movers",
+          "description": "Operations related to movers"
+        },
+        {
+          "name": "Option Chains",
+          "description": "Operations related to option chains"
+        },
+        {
+          "name": "Price History",
+          "description": "Operations related to price history"
+        },
+        {
+          "name": "Quotes",
+          "description": "Operations related to quotes"
+        }
+      ]
+    }
+  ]
+}

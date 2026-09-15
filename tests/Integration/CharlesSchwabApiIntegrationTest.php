@@ -20,12 +20,16 @@ class CharlesSchwabApiIntegrationTest extends TestCase {
     protected SchwabAPI $api;
 
     protected function setUp(): void {
-        $apiKey         = $_ENV['SCHWAB_API_KEY'];
-        $apiSecret      = $_ENV['SCHWAB_API_SECRET'];
-        $apiCallbackUri = $_ENV['SCHWAB_TOKEN_CALLBACK_URL'];
+        $apiKey         = $_ENV['SCHWAB_API_KEY'] ?? '';
+        $apiSecret      = $_ENV['SCHWAB_API_SECRET'] ?? '';
+        $apiCallbackUri = $_ENV['SCHWAB_TOKEN_CALLBACK_URL'] ?? '';
         $chromePath     = $_ENV['CHROME_PATH'] ?? '';
         $username       = $_ENV['SCHWAB_USERNAME'] ?? '';
         $password       = $_ENV['SCHWAB_PASSWORD'] ?? '';
+
+        if (empty($apiKey) || empty($apiSecret) || empty($apiCallbackUri)) {
+            $this->markTestSkipped('Schwab API credentials are not set in the environment.');
+        }
 
         // Attempt to get a fresh OAuth code using automation
         // Only if username, password, and Chrome path are provided
@@ -48,12 +52,12 @@ class CharlesSchwabApiIntegrationTest extends TestCase {
                 // Fall back to using CODE from ENV if automation fails
                 echo "\n⚠ OAuth automation failed: {$e->getMessage()}\n";
                 echo "Falling back to CODE from ENV\n";
-                $this->code = $_ENV['CODE'];
+                $this->code = $_ENV['CODE'] ?? '';
                 $this->session = $_ENV['SESSION'] ?? '';
             }
         } else {
             // Use manual OAuth code from ENV
-            $this->code = $_ENV['CODE'];
+            $this->code = $_ENV['CODE'] ?? '';
             $this->session = $_ENV['SESSION'] ?? '';
         }
 

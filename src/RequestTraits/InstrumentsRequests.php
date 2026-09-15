@@ -80,8 +80,7 @@ trait InstrumentsRequests {
 
     public function getInstrumentFromTicker( string $ticker ): array {
         $cusip = $this->getCusipFromTicker( $ticker );
-        $instrument = $this->instrumentByCusip($cusip);
-        dd( $instrument );
+        return $this->instrumentByCusip($cusip);
     }
 
 }

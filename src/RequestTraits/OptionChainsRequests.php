@@ -34,12 +34,12 @@ trait OptionChainsRequests {
 
 
     /**
-     * 
-     * Does not work yet.
+     * Get option chain for an optionable symbol.
+     *
      * @param string              $symbol
      * @param string              $contractType
      * @param int|NULL            $strikeCount
-     * @param bool                $includeUnderlyingQuote
+     * @param bool|NULL           $includeUnderlyingQuote
      * @param string              $strategy
      * @param float|NULL          $interval
      * @param float|NULL          $strike
@@ -56,46 +56,66 @@ trait OptionChainsRequests {
      *
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
-    public function chains( string $symbol,
-                            string $contractType = self::CONTRACT_TYPES[ 'ALL' ],
-                            int    $strikeCount = NULL,
-                            bool   $includeUnderlyingQuote = NULL,
-                            string $strategy = self::STRATEGIES[ 'SINGLE' ],
-                            float  $interval = NULL,
-                            float  $strike = NULL,
-                            string $range = NULL,
-                            Carbon $fromDate = NULL,
-                            Carbon $toDate = NULL,
-                            float  $volatility = NULL,
-                            float  $underlyingPrice = NULL,
-                            float  $interestRate = NULL,
-                            int    $daysToExpiration = NULL,
-                            string $expMonth = NULL,
-                            string $optionType = NULL,
-                            string $entitlement = NULL ): array {
-        $suffix                                      = '/marketdata/v1/chains';
-        $queryParameters                             = [];
-        $queryParameters[ 'symbol' ]                 = $symbol;
-        $queryParameters[ 'contractType' ]           = $contractType;
-        $queryParameters[ 'includeUnderlyingQuote' ] = $includeUnderlyingQuote;
-        $queryParameters[ 'strategy' ]               = $strategy;
+    public function chains( string  $symbol,
+                            string  $contractType = 'ALL',
+                            ?int    $strikeCount = NULL,
+                            ?bool   $includeUnderlyingQuote = NULL,
+                            string  $strategy = 'SINGLE',
+                            ?float  $interval = NULL,
+                            ?float  $strike = NULL,
+                            ?string $range = NULL,
+                            ?Carbon $fromDate = NULL,
+                            ?Carbon $toDate = NULL,
+                            ?float  $volatility = NULL,
+                            ?float  $underlyingPrice = NULL,
+                            ?float  $interestRate = NULL,
+                            ?int    $daysToExpiration = NULL,
+                            ?string $expMonth = NULL,
+                            ?string $optionType = NULL,
+                            ?string $entitlement = NULL ): array {
+        $suffix                      = '/marketdata/v1/chains';
+        $queryParameters             = [];
+        $queryParameters[ 'symbol' ] = $symbol;
 
-
-        if ( $includeUnderlyingQuote ):
-            $queryParameters[ 'includeUnderlyingQuote' ] = (string)$includeUnderlyingQuote;
+        if ( $contractType ):
+            $contractType = strtoupper( $contractType );
+            if ( !in_array( $contractType, self::CONTRACT_TYPES ) ):
+                throw new \Exception( "Invalid contract type '{$contractType}'." );
+            endif;
+            $queryParameters[ 'contractType' ] = $contractType;
         endif;
-        
-        
-        if ( $interval ):
+
+        if ( $strikeCount !== NULL ):
+            $queryParameters[ 'strikeCount' ] = $strikeCount;
+        endif;
+
+        if ( $includeUnderlyingQuote !== NULL ):
+            $queryParameters[ 'includeUnderlyingQuote' ] = $includeUnderlyingQuote ? 'TRUE' : 'FALSE';
+        endif;
+
+        if ( $strategy ):
+            $strategy = strtoupper( $strategy );
+            if ( !in_array( $strategy, self::STRATEGIES ) ):
+                throw new \Exception( "Invalid strategy type '{$strategy}'." );
+            endif;
+            $queryParameters[ 'strategy' ] = $strategy;
+        endif;
+
+        if ( $interval !== NULL ):
             $queryParameters[ 'interval' ] = $interval;
         endif;
 
-        if ( $strike ):
+        if ( $strike !== NULL ):
             $queryParameters[ 'strike' ] = $strike;
         endif;
 
         if ( $range ):
+            $range = strtoupper( $range );
+            if ( !in_array( $range, self::RANGES ) ):
+                throw new \Exception( "Invalid range type '{$range}'." );
+            endif;
             $queryParameters[ 'range' ] = $range;
         endif;
 
@@ -107,23 +127,27 @@ trait OptionChainsRequests {
             $queryParameters[ 'toDate' ] = $toDate->toDateString();
         endif;
 
-        if ( $volatility ):
+        if ( $volatility !== NULL ):
             $queryParameters[ 'volatility' ] = $volatility;
         endif;
 
-        if ( $underlyingPrice ):
+        if ( $underlyingPrice !== NULL ):
             $queryParameters[ 'underlyingPrice' ] = $underlyingPrice;
         endif;
 
-        if ( $interestRate ):
+        if ( $interestRate !== NULL ):
             $queryParameters[ 'interestRate' ] = $interestRate;
         endif;
 
-        if ( $daysToExpiration ):
+        if ( $daysToExpiration !== NULL ):
             $queryParameters[ 'daysToExpiration' ] = $daysToExpiration;
         endif;
 
         if ( $expMonth ):
+            $expMonth = strtoupper( $expMonth );
+            if ( !in_array( $expMonth, self::MONTHS ) ):
+                throw new \Exception( "Invalid expMonth type '{$expMonth}'." );
+            endif;
             $queryParameters[ 'expMonth' ] = $expMonth;
         endif;
 
@@ -132,28 +156,11 @@ trait OptionChainsRequests {
         endif;
 
         if ( $entitlement ):
+            $entitlement = strtoupper( $entitlement );
+            if ( !in_array( $entitlement, self::ENTITLEMENTS ) ):
+                throw new \Exception( "Invalid entitlement type '{$entitlement}'." );
+            endif;
             $queryParameters[ 'entitlement' ] = $entitlement;
-        endif;
-
-
-        if ( $contractType && !in_array( $contractType, self::CONTRACT_TYPES ) ):
-            throw new \Exception( "Invalid contract type '{$contractType}'." );
-        endif;
-
-        if ( $strategy && !in_array( $strategy, self::STRATEGIES ) ):
-            throw new \Exception( "Invalid strategy type '{$strategy}'." );
-        endif;
-
-        if ( $range && !in_array( $range, self::RANGES ) ):
-            throw new \Exception( "Invalid range type '{$range}'." );
-        endif;
-
-        if ( $expMonth && !in_array( $expMonth, self::MONTHS ) ):
-            throw new \Exception( "Invalid expMonth type '{$expMonth}'." );
-        endif;
-
-        if ( $entitlement && !in_array( $entitlement, self::ENTITLEMENTS ) ):
-            throw new \Exception( "Invalid entitlement type '{$entitlement}'." );
         endif;
 
         if ( $queryParameters ):

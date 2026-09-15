@@ -2,48 +2,23 @@
 
 namespace MichaelDrennen\SchwabAPI\Schemas;
 
+class Instrument extends AbstractSchema {
 
-class Instrument {
+    protected ?string $cusip = null;
+    protected ?string $symbol = null;
+    protected ?string $description = null;
+    protected ?string $exchange = null;
+    protected ?string $assetType = null;
+    protected ?string $type = null;
 
-
-    /**
-     * @var string
-     */
-    protected string $cusip;
-
-    /**
-     * @var string
-     */
-    protected string $symbol;
-
-    /**
-     * @var string
-     */
-    protected string $description;
-
-    /**
-     * @var string
-     */
-    protected string $exchange;
-
-    /**
-     * @var string
-     * @example BOND, EQUITY, ETF, EXTENDED, FOREX, FUTURE, FUTURE_OPTION, FUNDAMENTAL, INDEX, INDICATOR, MUTUAL_FUND, OPTION, UNKNOWN
-     */
-    protected string $assetType;
-
-    /**
-     * @var string
-     * @example BOND, EQUITY, ETF, EXTENDED, FOREX, FUTURE, FUTURE_OPTION, FUNDAMENTAL, INDEX, INDICATOR, MUTUAL_FUND, OPTION, UNKNOWN
-     */
-    protected string $type;
-
-    public function __construct( string $cusip,
-                                 string $symbol,
-                                 string $description,
-                                 string $exchange,
-                                 string $assetType,
-                                 string $type ) {
+    public function __construct(
+        ?string $cusip = null,
+        ?string $symbol = null,
+        ?string $description = null,
+        ?string $exchange = null,
+        ?string $assetType = null,
+        ?string $type = null
+    ) {
         $this->cusip       = $cusip;
         $this->symbol      = $symbol;
         $this->description = $description;
@@ -52,5 +27,21 @@ class Instrument {
         $this->type        = $type;
     }
 
+    public static function fromArray( array $data ): static {
+        return new static(
+            cusip: $data['cusip'] ?? null,
+            symbol: $data['symbol'] ?? null,
+            description: $data['description'] ?? null,
+            exchange: $data['exchange'] ?? null,
+            assetType: $data['assetType'] ?? null,
+            type: $data['type'] ?? null
+        );
+    }
 
+    public function getCusip(): ?string { return $this->cusip; }
+    public function getSymbol(): ?string { return $this->symbol; }
+    public function getDescription(): ?string { return $this->description; }
+    public function getExchange(): ?string { return $this->exchange; }
+    public function getAssetType(): ?string { return $this->assetType; }
+    public function getType(): ?string { return $this->type; }
 }

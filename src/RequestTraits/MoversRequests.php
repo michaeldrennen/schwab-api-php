@@ -34,25 +34,23 @@ trait MoversRequests {
 
 
 
-    public function movers( string $symbolId, string $sort = NULL, int $frequency = 0 ): array {
-        $suffix = '/marketdata/v1/movers/' . $symbolId;
-
-        $queryParameters                = [];
-        $queryParameters[ 'symbol_id' ] = strtoupper( $symbolId );
-
-        if ( $sort ):
-            $queryParameters[ 'sort' ] = strtoupper( $sort );
-        endif;
-
-        if ( $frequency ):
-            $queryParameters[ 'frequency' ] = $frequency;
-        endif;
-
+    /**
+     * Get Movers for a specific index.
+     *
+     * @param string      $symbolId
+     * @param string|NULL $sort
+     * @param int         $frequency
+     *
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
+     */
+    public function movers( string $symbolId, ?string $sort = NULL, int $frequency = 0 ): array {
         if ( !in_array( $symbolId, self::VALID_SYMBOLS ) ):
             throw new \Exception( "You entered a symbol of '$symbolId' but the only valid values are " . implode( ', ', self::VALID_SYMBOLS ) );
         endif;
 
-        if ( !in_array( $sort, self::VALID_SORTS ) ):
+        if ( $sort !== NULL && !in_array( strtoupper( $sort ), self::VALID_SORTS ) ):
             throw new \Exception( "You entered a sort of '$sort' but the only valid values are " . implode( ', ', self::VALID_SORTS ) );
         endif;
 
@@ -60,7 +58,20 @@ trait MoversRequests {
             throw new \Exception( "You entered a frequency of '$frequency' but the only valid values are " . implode( ', ', self::VALID_FREQUENCIES ) );
         endif;
 
-        $suffix .= '?' . http_build_query( $queryParameters );
+        $suffix          = '/marketdata/v1/movers/' . rawurlencode( $symbolId );
+        $queryParameters = [];
+
+        if ( $sort !== NULL ):
+            $queryParameters[ 'sort' ] = strtoupper( $sort );
+        endif;
+
+        if ( $frequency > 0 ):
+            $queryParameters[ 'frequency' ] = $frequency;
+        endif;
+
+        if ( !empty( $queryParameters ) ):
+            $suffix .= '?' . http_build_query( $queryParameters );
+        endif;
 
         $response = $this->_request( $suffix );
         return $this->json( $response );
