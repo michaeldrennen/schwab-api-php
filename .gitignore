@@ -7,3 +7,4 @@ phpunit.xml
 .idea/
 .phpunit.result.cache
 composer.lock
+schwab-api-documentation.json
