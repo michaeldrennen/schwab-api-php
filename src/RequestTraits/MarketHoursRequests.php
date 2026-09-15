@@ -125,13 +125,13 @@ trait MarketHoursRequests {
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getNextOpenDateForMarket( string $marketId,
-                                              string $subMarketId = NULL,
-                                              Carbon $anchorDate = NULL,
+                                              ?string $subMarketId = 'EQ',
+                                              ?Carbon $anchorDate = NULL,
                                               string $timezone = SchwabAPI::DEFAULT_TIMEZONE ): Carbon {
 
         return $this->_getDateForMarket( 'next',
                                          $marketId,
-                                         $subMarketId,
+                                         $subMarketId ?? 'EQ',
                                          $anchorDate,
                                          $timezone );
     }
@@ -147,13 +147,13 @@ trait MarketHoursRequests {
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getPreviousOpenDateForMarket( string $marketId,
-                                                  string $subMarketId = NULL,
-                                                  Carbon $anchorDate = NULL,
+                                                  ?string $subMarketId = 'EQ',
+                                                  ?Carbon $anchorDate = NULL,
                                                   string $timezone = SchwabAPI::DEFAULT_TIMEZONE ): Carbon {
 
         return $this->_getDateForMarket( 'prev',
                                          $marketId,
-                                         $subMarketId,
+                                         $subMarketId ?? 'EQ',
                                          $anchorDate,
                                          $timezone );
     }

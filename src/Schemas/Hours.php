@@ -65,6 +65,25 @@ class Hours extends AbstractSchema {
         );
     }
 
+    public static function fromCollection( array $items ): array {
+        $result = [];
+        foreach ( $items as $key => $value ) {
+            if ( !is_array($value) ) {
+                continue;
+            }
+            if ( isset($value['date']) || isset($value['marketType']) || isset($value['product']) || isset($value['sessionHours']) || isset($value['isOpen']) ) {
+                $result[$key] = static::fromArray($value);
+            } else {
+                foreach ( $value as $subKey => $subValue ) {
+                    if ( is_array($subValue) ) {
+                        $result[$key][$subKey] = static::fromArray($subValue);
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+
     public function getCategory(): ?string { return $this->category; }
     public function getDate(): ?string { return $this->date; }
     public function getDescription(): ?string { return $this->description; }

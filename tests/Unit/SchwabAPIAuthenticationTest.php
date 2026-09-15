@@ -61,15 +61,29 @@ class SchwabAPIAuthenticationTest extends TestCase {
     /**
      * @test
      */
-    public function testConstructorRequiresEitherCodeOrAccessToken(): void {
+    public function testConstructorRequiresEitherCodeOrAccessTokenOrRefreshToken(): void {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Either authentication code or access token must be provided');
+        $this->expectExceptionMessage('Either authentication code, access token, or refresh token must be provided');
 
         new SchwabAPI(
             apiKey: 'test_key',
             apiSecret: 'test_secret',
             apiCallbackUrl: 'https://test.com/callback'
         );
+    }
+
+    /**
+     * @test
+     */
+    public function testConstructorAcceptsRefreshTokenInsteadOfCode(): void {
+        $api = new SchwabAPI(
+            apiKey: 'test_key',
+            apiSecret: 'test_secret',
+            apiCallbackUrl: 'https://test.com/callback',
+            refreshToken: 'test_refresh_token'
+        );
+
+        $this->assertInstanceOf(SchwabAPI::class, $api);
     }
 
     /**

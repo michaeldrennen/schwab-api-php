@@ -147,9 +147,9 @@ class SchwabAPI {
             throw new \InvalidArgumentException('API Callback URL is required and cannot be empty');
         }
 
-        // Validate that either authentication code or access token is provided
-        if (empty($authenticationCode) && empty($accessToken)) {
-            throw new \InvalidArgumentException('Either authentication code or access token must be provided');
+        // Validate that authentication code, access token, or refresh token is provided
+        if (empty($authenticationCode) && empty($accessToken) && empty($refreshToken)) {
+            throw new \InvalidArgumentException('Either authentication code, access token, or refresh token must be provided');
         }
 
         $this->apiKey         = $apiKey;
@@ -227,26 +227,36 @@ class SchwabAPI {
      * @throws \MichaelDrennen\SchwabAPI\Exceptions\RequestException
      */
     public function requestToken( bool $doRefreshToken = FALSE ): void {
-        $options = [
-            'headers'     => [
-                'Authorization' => "Basic " . base64_encode( $this->apiKey . ':' . $this->apiSecret ),
-                'Content-Type'  => 'application/x-www-form-urlencoded',
-            ],
-            'debug'       => FALSE,
-            'form_params' => [
-                'grant_type'   => 'authorization_code',
-                'code'         => $this->code,
-                'redirect_uri' => $this->apiCallbackUrl,
-            ],
-        ];
+        $shouldRefresh = $doRefreshToken || (empty( $this->code ) && !empty( $this->refreshToken ));
 
-
-        if ( $doRefreshToken ) {
+        if ( $shouldRefresh ) {
             if ( !$this->refreshToken ) {
                 throw new \Exception( "You are asking to refresh the access token, but you don't have a refresh token." );
             }
-            $options[ 'form_params' ][ 'grant_type' ]    = 'refresh_token';
-            $options[ 'form_params' ][ 'refresh_token' ] = $this->refreshToken;
+            $options = [
+                'headers'     => [
+                    'Authorization' => "Basic " . base64_encode( $this->apiKey . ':' . $this->apiSecret ),
+                    'Content-Type'  => 'application/x-www-form-urlencoded',
+                ],
+                'debug'       => FALSE,
+                'form_params' => [
+                    'grant_type'    => 'refresh_token',
+                    'refresh_token' => $this->refreshToken,
+                ],
+            ];
+        } else {
+            $options = [
+                'headers'     => [
+                    'Authorization' => "Basic " . base64_encode( $this->apiKey . ':' . $this->apiSecret ),
+                    'Content-Type'  => 'application/x-www-form-urlencoded',
+                ],
+                'debug'       => FALSE,
+                'form_params' => [
+                    'grant_type'   => 'authorization_code',
+                    'code'         => $this->code,
+                    'redirect_uri' => $this->apiCallbackUrl,
+                ],
+            ];
         }
 
         try {
